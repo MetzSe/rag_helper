@@ -1,0 +1,42 @@
+[project]
+name = "rag-helper"
+version = "0.1.0"
+description = "A RAG system for similarity search in query libraries."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy",
+    "openpyxl",
+    "pandas",
+    "pydantic",
+    "python-dotenv",
+    "scikit-learn",
+    "sentence-transformers",
+    "torch",
+    "tqdm",
+    "rich",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "vulture",
+]
+
+[project.scripts]
+rag-cli = "rag_helper.cli:main"
+rag-cli-interactive = "rag_helper.interactive_cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
