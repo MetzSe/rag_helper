@@ -49,6 +49,7 @@ logs/
 *.db
 *.sqlite
 *.sqlite3
+!querylib_20250825.db
 
 # Environment files
 .env
