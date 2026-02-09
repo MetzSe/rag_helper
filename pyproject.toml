@@ -3,6 +3,7 @@ name = "rag-helper"
 version = "0.1.0"
 description = "A RAG system for similarity search in query libraries."
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "numpy",

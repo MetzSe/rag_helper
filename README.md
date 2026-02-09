@@ -2,6 +2,8 @@
 
 A Retrieval-Augmented Generation (RAG) utility for managing and querying SQL query libraries. This library provides both programmatic and command-line interfaces for integrating similarity-based query matching into your codebase.
 
+This work is based on work by [Ziletti et al.](https://github.com/Bayer-Group/text-to-sql-epi-ehr-naacl2024).
+
 ## Installation
 
 This project uses [uv](https://github.com/astral-sh/uv) for dependency management. All commands should be run via `uv run`. First initialise the proper venv:
@@ -40,14 +42,18 @@ print(results)
 
 The pipeline CLI is designed for automation and integration into data workflows. All commands support an optional `--output` / `-o` flag to export results to a file (`.csv`, `.json`, `.xlsx`).
 
-### Global Arguments
-
-| Argument | Description |
-|---|---|
 | `--file`, `-f` | Path to the `.db` query library file. |
-| `--overview` | Show a quick usage guide and exit. |
 
 ### Commands
+
+#### `help`
+
+Show a quick usage guide and exit.
+
+**Example:**
+```bash
+rag-cli help
+```
 
 #### `view`
 
@@ -134,7 +140,7 @@ For manual exploration, a menu-driven interactive CLI is available. It provides 
 uv run rag-cli-interactive
 ```
 
-> **Note:** The "View Full CLI Documentation" option (and the `--docs` flag) displays documentation that is automatically synchronized with the docstrings in the source code. This means the displayed information is always accurate and reflects the current implementation.
+> **Note:** The "View Full CLI Documentation" option (and the `docs` command) displays documentation that is automatically synchronized with the docstrings in the source code. This means the displayed information is always accurate and reflects the current implementation.
 
 ---
 

@@ -17,8 +17,8 @@ def mock_ql():
     ql.col_query_executable = "QUERY"
     return ql
 
-def test_cli_overview_flag(capsys):
-    with patch.object(sys, 'argv', ['rag-cli', '--overview']):
+def test_cli_help_command(capsys):
+    with patch.object(sys, 'argv', ['rag-cli', 'help']):
         main()
     captured = capsys.readouterr()
     assert "Quick Overview" in captured.out

@@ -177,7 +177,7 @@ def match_queries(ql: QueryLibrary, queries: list[str], top_k: int = 5, threshol
         final_df = pd.concat(all_results)
         export_to_file(final_df, output_path)
 
-def print_overview():
+def print_help_overview():
     """Print a comprehensive usage guide."""
     console.print(Panel.fit(
         "[bold cyan]Query Library Visualizer & RAG Matcher[/bold cyan]\n\n"
@@ -247,9 +247,11 @@ def get_parser():
     """Creates and returns the argparse parser for the CLI."""
     parser = argparse.ArgumentParser(description="Visualize and search QueryLibrary databases.")
     parser.add_argument("--file", "-f", help="Path to the .db query library file.")
-    parser.add_argument("--overview", action="store_true", help="Show overview of the tool and exit")
     
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
+    
+    # Help command
+    subparsers.add_parser("help", help="Show overview of the tool and exit")
     
     # View command
     view_parser = subparsers.add_parser("view", help="View the first N records")
@@ -282,8 +284,8 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     
-    if args.overview:
-        print_overview()
+    if args.command == "help":
+        print_help_overview()
         return
 
     if args.command == "docs":

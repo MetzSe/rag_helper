@@ -10,7 +10,7 @@ from rich.table import Table
 from rich import box
 
 from rag_helper.query_library import QueryLibrary
-from rag_helper.cli import view_head, view_info, search_library, match_queries, print_overview, generate_cli_docs
+from rag_helper.cli import view_head, view_info, search_library, match_queries, print_help_overview, generate_cli_docs
 
 console = Console()
 
@@ -282,8 +282,8 @@ class InteractiveExplorer:
 
 def main():
     """Entry point for the interactive CLI."""
-    if "--overview" in sys.argv:
-        print_overview()
+    if "help" in sys.argv:
+        print_help_overview()
         return
 
     if "--docs" in sys.argv:
