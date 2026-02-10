@@ -9,7 +9,7 @@ from rich.prompt import Prompt, IntPrompt, Confirm
 from rich.table import Table
 from rich import box
 
-from rag_helper.query_library import QueryLibrary
+from rag_helper.query_library_manager import QueryLibraryManager
 from rag_helper.cli import view_head, view_info, search_library, match_queries, print_help_overview, generate_cli_docs
 
 console = Console()
@@ -19,7 +19,7 @@ BACK_HINT = "[dim]Enter 'q' or press Enter to return to Main Menu.[/dim]"
 class InteractiveExplorer:
     def __init__(self):
         self.selected_db: Optional[str] = None
-        self.ql: Optional[QueryLibrary] = None
+        self.ql: Optional[QueryLibraryManager] = None
         self.project_root: Path = Path.cwd()
 
     def scan_databases(self) -> List[str]:
@@ -69,7 +69,7 @@ class InteractiveExplorer:
         
         console.print(f"[green]Selected:[/green] {dbs[choice]}")
         try:
-            self.ql = QueryLibrary.load(self.selected_db)
+            self.ql = QueryLibraryManager.load(self.selected_db)
             console.print(f"[bold green]Successfully loaded library: {self.ql.querylib_name}[/bold green]")
         except Exception as e:
             console.print(f"[red]Error loading database:[/red] {e}")

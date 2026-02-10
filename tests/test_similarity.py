@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from rag_helper.query_library import QueryLibrary
+from rag_helper.query_library_manager import QueryLibraryManager
 
 
 @pytest.fixture
@@ -20,10 +20,10 @@ def mock_query_lib():
     })
 
     with patch(
-        "rag_helper.query_library.pd.read_excel",
+        "rag_helper.query_library_manager.pd.read_excel",
         return_value=df
     ):
-        ql = QueryLibrary(
+        ql = QueryLibraryManager(
             querylib_name="test_lib",
             source="test",
             querylib_source_file="dummy.xlsx",
@@ -39,7 +39,7 @@ def test_query_library_init(mock_query_lib):
     assert mock_query_lib.querylib_name == "test_lib"
 
 
-@patch("rag_helper.query_library.make_sentence_transformer")
+@patch("rag_helper.query_library_manager.make_sentence_transformer")
 def test_calc_embedding(mock_transformer, mock_query_lib):
     # Mock the model's encode method
     mock_model = MagicMock()

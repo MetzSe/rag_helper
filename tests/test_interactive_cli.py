@@ -26,7 +26,7 @@ def test_select_db_flow(explorer, tmp_path):
     
     with patch.object(explorer, 'scan_databases', return_value=["db1.db", "db2.db"]):
         with patch("rag_helper.interactive_cli.Prompt.ask", return_value="1"):
-            with patch("rag_helper.query_library.QueryLibrary.load", return_value=MagicMock(querylib_name="LoadedDB")):
+            with patch("rag_helper.query_library_manager.QueryLibraryManager.load", return_value=MagicMock(querylib_name="LoadedDB")):
                 explorer.select_db()
                 assert "db2.db" in explorer.selected_db
                 assert explorer.ql.querylib_name == "LoadedDB"

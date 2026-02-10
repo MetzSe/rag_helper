@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from rag_helper.cli import main, export_to_file, view_head, search_library, match_queries
-from rag_helper.query_library import QueryLibrary
+from rag_helper.query_library_manager import QueryLibraryManager
 
 
 # --- Unit tests for export_to_file ---
@@ -22,9 +22,10 @@ def test_export_to_file_csv(tmp_path, capsys):
     assert "Successfully exported" in captured.out
     assert output_file.exists()
     
-    loaded_df = pd.read_csv(output_file, index_col=0)
+    loaded_df = pd.read_csv(output_file)
     assert len(loaded_df) == 2
     assert "A" in loaded_df.columns
+    assert "B" in loaded_df.columns
 
 
 def test_export_to_file_json(tmp_path, capsys):
@@ -53,7 +54,7 @@ def test_export_to_file_xlsx(tmp_path, capsys):
     assert "Successfully exported" in captured.out
     assert output_file.exists()
     
-    loaded_df = pd.read_excel(output_file, index_col=0)
+    loaded_df = pd.read_excel(output_file)
     assert len(loaded_df) == 2
 
 
@@ -77,10 +78,13 @@ def mock_ql():
     ql.querylib_name = "test_lib"
     ql.df_querylib = pd.DataFrame({
         "QUESTION": ["Test Q1", "Test Q2"],
+        "QUESTION_MASKED": ["Masked Q1", "Masked Q2"],
         "QUESTION_TYPE": ["QA", "QA"]
     })
     ql.col_question = "QUESTION"
+    ql.col_question_masked = "QUESTION_MASKED"
     ql.col_query_executable = "QUERY"
+    ql.col_query_w_placeholders = "QP"
     return ql
 
 
@@ -96,7 +100,7 @@ def test_cli_view_with_output(mock_ql, tmp_path, capsys):
     assert "Successfully exported" in captured.out
     assert output_file.exists()
     
-    loaded_df = pd.read_csv(output_file, index_col=0)
+    loaded_df = pd.read_csv(output_file)
     assert len(loaded_df) == 2
 
 
@@ -116,11 +120,12 @@ def test_cli_search_with_output(mock_ql, tmp_path, capsys):
 def test_cli_match_with_output(mock_ql, tmp_path, capsys):
     """Integration test for `match --output`."""
     output_file = tmp_path / "match_output.csv"
+    # match_queries expects a result with SourceQuery, Score, and QUESTION_MASKED if no columns specified
     results = pd.DataFrame({
         "Score": [0.9],
-        "QUESTION": ["Test Q1"],
+        "QUESTION_MASKED": ["Masked Q1"],
         "QUERY": ["SELECT 1"]
-    })
+    }, index=[10])
     
     with patch("rag_helper.cli.load_library", return_value=mock_ql):
         with patch("rag_helper.rag.RAGProcessor.get_similar_queries", return_value=results):
@@ -135,11 +140,11 @@ def test_cli_match_with_output(mock_ql, tmp_path, capsys):
 # --- Additional coverage gap tests ---
 
 def test_load_library_fails_on_bad_file(capsys):
-    """Test that load_library exits gracefully when QueryLibrary.load returns None."""
+    """Test that load_library exits gracefully when QueryLibraryManager.load returns None."""
     from rag_helper.cli import load_library
     
     with pytest.raises(SystemExit):
-        with patch("rag_helper.query_library.QueryLibrary.load", return_value=None):
+        with patch("rag_helper.query_library_manager.QueryLibraryManager.load", return_value=None):
             load_library("/path/to/nonexistent.db")
     
     captured = capsys.readouterr()
@@ -150,6 +155,7 @@ def test_rag_processor_empty_results(capsys):
     """Test RAGProcessor handles empty result set gracefully."""
     mock_ql = MagicMock()
     mock_ql.col_query_executable = "QUERY"
+    mock_ql.col_query_w_placeholders = "QP"
     
     empty_results = pd.DataFrame()
     
@@ -159,7 +165,7 @@ def test_rag_processor_empty_results(capsys):
                 main()
     
     captured = capsys.readouterr()
-    assert "No similar queries found" in captured.out
+    assert "No matches found above threshold" in captured.out
 
 
 def test_view_info_with_output(tmp_path, capsys):
@@ -169,7 +175,7 @@ def test_view_info_with_output(tmp_path, capsys):
     mock_ql.col_query_w_placeholders = "QP"
     mock_ql.col_query_executable = "QE"
     
-    row = pd.Series({"QUESTION": "Detailed Q", "QP": "SELECT ?", "QE": "SELECT 1"})
+    row = pd.Series({"QUESTION_MASKED": "Detailed Q", "QP": "SELECT ?", "QE": "SELECT 1"})
     mock_ql.df_querylib = MagicMock()
     mock_ql.df_querylib.loc.__getitem__.return_value = row
     

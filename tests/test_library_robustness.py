@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 import numpy as np
 import pytest
-from rag_helper.query_library import QueryLibrary
+from rag_helper.query_library_manager import QueryLibraryManager
 
 @pytest.fixture
 def sample_df():
@@ -16,7 +16,7 @@ def sample_df():
 
 def test_library_save_load_cycle(sample_df, tmp_path):
     db_file = tmp_path / "test_cycle.db"
-    ql = QueryLibrary(
+    ql = QueryLibraryManager(
         querylib_name="cycle_test",
         source="unit",
         querylib_source_file=None,
@@ -37,7 +37,7 @@ def test_library_save_load_cycle(sample_df, tmp_path):
     ql.save(str(db_file))
     
     # Load back
-    loaded_ql = QueryLibrary.load(db_file)
+    loaded_ql = QueryLibraryManager.load(db_file)
     assert loaded_ql.querylib_name == "cycle_test"
     assert len(loaded_ql.df_querylib) == 2
     assert loaded_ql.col_question == "QUESTION"
@@ -51,7 +51,7 @@ def test_handling_of_null_questions(tmp_path):
         "QUERY_WITH_PLACEHOLDERS": ["SELECT 1", "SELECT 2"]
     })
     
-    ql = QueryLibrary(
+    ql = QueryLibraryManager(
         querylib_name="null_test",
         source="unit",
         querylib_source_file=None,
@@ -63,7 +63,7 @@ def test_handling_of_null_questions(tmp_path):
     
     # calc_embedding should drop the null row
     from unittest.mock import MagicMock, patch
-    with patch("rag_helper.query_library.make_sentence_transformer") as mock_transformer:
+    with patch("rag_helper.query_library_manager.make_sentence_transformer") as mock_transformer:
         mock_model = MagicMock()
         mock_model.encode.return_value = np.zeros(384, dtype=np.float32)
         mock_transformer.return_value = mock_model
@@ -74,5 +74,5 @@ def test_handling_of_null_questions(tmp_path):
     assert ql.df_querylib.iloc[0]["QUESTION"] == "Valid question"
 
 def test_storage_type_initialization():
-    ql = QueryLibrary("test", "test", None, "Q", "QM", "QP")
+    ql = QueryLibraryManager("test", "test", None, "Q", "QM", "QP")
     assert ql.storage_type == "sqlite"

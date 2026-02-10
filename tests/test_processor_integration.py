@@ -1,7 +1,7 @@
 import os
 import pytest
-from rag_helper.rag import QueryLibraryManager, RAGProcessor, RAGConfig
-from rag_helper.query_library import QueryLibrary
+from rag_helper.rag import RAGProcessor, RAGConfig
+from rag_helper.query_library_manager import QueryLibraryManager
 import pandas as pd
 import numpy as np
 
@@ -15,7 +15,7 @@ def temp_db(tmp_path):
         "QUERY_RUNNABLE": ["SELECT *"],
         "QUESTION_TYPE": ["QA"]
     })
-    ql = QueryLibrary("test", "test", None, "QUESTION", "QUESTION_MASKED", "QUERY_WITH_PLACEHOLDERS", "QUERY_RUNNABLE")
+    ql = QueryLibraryManager("test", "test", None, "QUESTION", "QUESTION_MASKED", "QUERY_WITH_PLACEHOLDERS", "QUERY_RUNNABLE")
     ql.df_querylib = df
     ql.embeddings.append({
         "model_name": "BAAI/bge-large-en-v1.5",
@@ -36,7 +36,7 @@ def test_end_to_end_matching(temp_db, monkeypatch):
     
     # Mock embedding model to avoid downloading
     from unittest.mock import MagicMock, patch
-    with patch("rag_helper.query_library.make_sentence_transformer") as mock_transformer:
+    with patch("rag_helper.query_library_manager.make_sentence_transformer") as mock_transformer:
         mock_model = MagicMock()
         mock_model.encode.return_value = np.zeros((1, 384), dtype=np.float32)
         mock_transformer.return_value = mock_model

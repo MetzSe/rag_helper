@@ -20,6 +20,11 @@ dependencies = [
     "pytest-cov",
     "ruff",
     "vulture",
+    "pip>=26.0.1",
+    "ipykernel>=7.2.0",
+    "iprogress>=0.4",
+    "jupyter>=1.1.1",
+    "ipywidgets>=8.1.8",
 ]
 
 [project.scripts]
@@ -41,3 +46,12 @@ ignore = []
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[dependency-groups]
+dev = [
+    "pdoc>=16.0.0",
+]
